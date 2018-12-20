@@ -1,6 +1,6 @@
 CC=g++
 OBJS=*.cpp
-CFLAGS=-w
+CFLAGS=-w -std=c++11
 LFLAGS=-lsfml-system -lsfml-graphics -lsfml-window -lsfml-audio -lsfml-network
 OUT=citybuild
 
