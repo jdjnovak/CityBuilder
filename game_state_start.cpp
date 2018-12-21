@@ -81,6 +81,7 @@ GameStateStart::GameStateStart(Game* game) {
 	pos *= 0.5f;
 	this->view.setCenter(pos);
 
+
 	this->guiSystem.emplace("menu", Gui(sf::Vector2f(192, 32), 4, false, game->stylesheets.at("button"),
 										{ std::make_pair("Load Game", "load_game") }));
 
