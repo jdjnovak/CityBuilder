@@ -125,7 +125,6 @@ GameStateEditor::GameStateEditor(Game* game) {
 
     this->zoomLevel = 1.0f;
 
-    /* Centre the camera on the map */
     sf::Vector2f centre(this->map.width, this->map.height*0.5);
     centre *= float(this->map.tileSize);
     gameView.setCenter(centre);
