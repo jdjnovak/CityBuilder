@@ -1,105 +1,104 @@
 #ifndef GUI_HPP
 #define GUI_HPP
 
-#include <SFML/Graphics.hpp>
-
 #include <vector>
 #include <utility>
 #include <string>
 
 class GuiStyle {
 public:
-  sf::Color bodyCol;
-  sf::Color bodyHighlightCol;
-  sf::Color borderCol;
-  sf::Color borderHighlightCol;
-  sf::Color textCol;
-  sf::Color textHighlightCol;
-  sf::Font* font;
+    sf::Color bodyCol;
+    sf::Color bodyHighlightCol;
+    sf::Color borderCol;
+    sf::Color borderHighlightCol;
+    sf::Color textCol;
+    sf::Color textHighlightCol;
+    sf::Font* font;
 
-  float borderSize;
+    float borderSize;
 
-  GuiStyle() { }
+    GuiStyle(sf::Font* font, float borderSize,
+             sf::Color bodyCol, sf::Color borderCol, sf::Color textCol,
+			 sf::Color bodyHighlightCol, sf::Color borderHighlightCol, sf::Color textHighlightCol) {
 
-  GuiStyle(sf::Font* font, float borderSize, sf::Color bodyCol,
-	   sf::Color borderCol, sf::Color textCol, sf::Color bodyHighlightCol,
-	   sf::Color borderHighlightCol, sf::Color textHighlightCol) {
-    this->bodyCol =              bodyCol;
-    this->borderCol =            borderCol;
-    this->textCol =              textCol;
-    this->bodyHighlightCol =     bodyHighlightCol;
-    this->borderHighlightCol =   borderHighlightCol;
-    this->textHighlightCol =     textHighlightCol;
-    this->font =                 font;
-    this->borderSize =           borderSize;
-  }
+        this->bodyCol = bodyCol;
+        this->borderCol = borderCol;
+        this->textCol = textCol;
+        this->bodyHighlightCol = bodyHighlightCol;
+        this->borderHighlightCol = borderHighlightCol;
+        this->textHighlightCol = textHighlightCol;
+        this->font = font;
+        this->borderSize = borderSize;
+    }
+
+    GuiStyle() { }
 };
 
 class GuiEntry {
 public:
-  sf::RectangleShape shape;
-  std::string message;
-  sf::Text text;
+    sf::RectangleShape shape;
+    std::string message;
+    sf::Text text;
 
-  GuiEntry() { }
+    GuiEntry(const std::string& message, sf::RectangleShape shape, sf::Text text) {
+        this->message = message;
+        this->shape = shape;
+        this->text = text;
+    }
 
-  GuiEntry(const std::string& message, sf::RectangleShape shape, sf::Text text) {
-    this->message = message;
-    this->shape = shape;
-    this->text = text;
-  }
+    GuiEntry() { }
 };
 
 class Gui : public sf::Transformable, public sf::Drawable {
 private:
-  bool horizontal;
-  GuiStyle style;
-  sf::Vector2f dimensions;
-  int padding;
-
+    bool horizontal;
+    GuiStyle style;
+    sf::Vector2f dimensions;
+    int padding;
+	
 public:
-  std::vector<GuiEntry> entries;
-  bool visible;
+    std::vector<GuiEntry> entries;
+    bool visible;
 
-  Gui(sf::Vector2f dimensions, int padding, bool horizontal,
-      GuiStyle& style, std::vector<std::pair<std::string, std::string>> entries) {
-    visible = false;
-    this->horizontal = horizontal;
-    this->style = style;
-    this->dimensions = dimensions;
-    this->padding = padding;
+    Gui(sf::Vector2f dimensions, int padding, bool horizontal,
+        GuiStyle& style, std::vector<std::pair<std::string, std::string>> entries) {
 
-    sf::RectangleShape shape;
-    shape.setSize(dimensions);
-    shape.setFillColor(style.bodyCol);
-    shape.setOutlineThickness(-style.borderSize);
-    shape.setOutlineColor(style.borderCol);
+        visible = false;
+        this->horizontal = horizontal;
+        this->style = style;
+        this->dimensions = dimensions;
+        this->padding = padding;
 
-    for (auto entry : entries) {
-      sf::Text text;
-      text.setString(entry.first);
-      text.setFont(*style.font);
-      text.setColor(style.textCol);
-      text.setCharacterSize(dimensions.y - style.borderSize - padding);
+        sf::RectangleShape shape;
+        shape.setSize(dimensions);
+        shape.setFillColor(style.bodyCol);
+        shape.setOutlineThickness(-style.borderSize);
+        shape.setOutlineColor(style.borderCol);
 
-      this->entries.push_back(GuiEntry(entry.second, shape, text));
+        for(auto entry : entries) {
+            sf::Text text;
+            text.setString(entry.first);
+            text.setFont(*style.font);
+            text.setColor(style.textCol);
+            text.setCharacterSize(dimensions.y-style.borderSize-padding);
+            this->entries.push_back(GuiEntry(entry.second, shape, text));
+        }
     }
-  }
 
-  sf::Vector2f getSize();
-  int getEntry(const sf::Vector2f mousePos);
-  void setEntryText(int entry, std::string text);
-  void setDimensions(sf::Vector2f dimensions);
+    sf::Vector2f getSize();
 
-  virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const;
+    int getEntry(const sf::Vector2f mousePos);
+    void setEntryText(int entry, std::string text);
+    void setDimensions(sf::Vector2f dimensions);
 
-  void show();
-  void hide();
-  void highlight(const int entry);
-  std::string activate(const int entry);
-  std::string activate(const sf::Vector2f mousePos);
+    virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const;
 
+    void show();
+    void hide();
+    void highlight(const int entry);
 
+    std::string activate(const int entry);
+    std::string activate(const sf::Vector2f mousePos);
 };
 
 #endif /* GUI_HPP */
