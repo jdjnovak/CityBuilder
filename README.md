@@ -11,5 +11,5 @@ A city building game built on SFML (C++). I am following this [guide](https://ww
 [x] Chapter 7  
 [x] Chapter 8  
 [x] Chapter 9  
-[ ] Chapter 10  
+[x] Chapter 10  
 
