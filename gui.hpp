@@ -7,7 +7,7 @@
 
 class GuiStyle {
 public:
-    sf::Color bodyCol;
+    sf::Color bodyCol;			// 
     sf::Color bodyHighlightCol;
     sf::Color borderCol;
     sf::Color borderHighlightCol;

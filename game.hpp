@@ -1,8 +1,6 @@
 #ifndef GAME_HPP
 #define GAME_HPP
 
-
-
 #include <stack>
 #include <map>
 #include <string>

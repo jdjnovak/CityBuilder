@@ -148,7 +148,7 @@ void City::update(float dt) {
 	}
 
 	for (int i = 0; i < this->map.tiles.size(); ++i) {
-		Tile& tile = this->map.tiles[this->shuffleTiles[i]];
+		Tile& tile = this->map.tiles[this->shuffledTiles[i]];
 		if (tile.tileType == TileType::RESIDENTIAL) {
 			this->distributePool(this->populationPool, tile, this->birthRate - this->deathRate);
 			popTotal += tile.population;
@@ -159,7 +159,8 @@ void City::update(float dt) {
 
 		} else if (tile.tileType == TileType::INDUSTRIAL) {
 			/* Extract resources from the ground */
-			if (this->tile.resources[i] > 0 && rand() % 100 < this->population) {
+			//if (this->tile.resources[i] > 0 && rand() % 100 < this->population) {
+			if (this->map.resources[i] > 0 && rand() % 100 < this->population) {
 				++tile.production;
 				--this->map.resources[i];
 			}
@@ -171,7 +172,84 @@ void City::update(float dt) {
 		tile.update();
 	}
 
-	/////////////////////////////////////////////
-	// STOPPED HERE ON CH 10 from the tutorial //
-	/////////////////////////////////////////////
+	// Run a second pass for goods manufacturing 
+	for (int i = 0; i < this->map.tiles.size(); ++i) {
+		Tile& tile = this->map.tiles[this->shuffledTiles[i]];
+
+		if (tile.tileType == TileType::INDUSTRIAL) {
+			int receivedResources = 0;
+			// Get resources from smalled and connected zones
+			for (auto& tile2 : this->map.tiles) {
+				if (tile2.regions[0] == til
+					e.regions[0] && tile2.tileType == TileType::INDUSTRIAL) {
+					if (tile2.production > 0) {
+						++receivedResources;
+						--tile2.production;
+					}
+
+					if (receivedResources >= tile.tileVariant + 1) break;
+				}
+			}
+
+			// Turn resources to goods
+			tile.storedGoods += (receivedResources + tile.production) * (tile.tileVariant + 1);
+		}
+	}
+
+
+	// Run third pass for goods distribution
+	for (int i = 0; i < this->map.tiles.size(); ++i) {
+		Tile& tile = this->map.tiles[this->shuffledTiles[i]];
+
+		if (tile.tileType == TileType::COMMERCIAL) {
+			int receivedGoods = 0;
+			double maxCustomers = 0.0;
+			for (auto& tile2 : this->map.tiles) {
+				if (tile2.regions[0] == tile.regions[0] &&
+					tile2.tileType == TileType::INDUSTRIAL &&
+					tile2.storedGoods > 0) {
+
+					while (tile2.storedGoods > 0 && receivedGoods != tile.tileVariant + 1) {
+						--tile2.storedGoods;
+						++receivedGoods;
+						industrialRevenue += 100 * (1.0 - industrialTax);
+					}
+				} else if (tile2.regions[0] == tile.regions[0] &&
+						   tile2.tileType == TileType::INDUSTRIAL) {
+
+					maxCustomers += tile2.population;
+				}
+
+				if (receivedGoods == tile.tileVariant + 1) break;
+			}
+
+			tile.production = (receivedGoods * 100.0 + rand() % 20) * (1.0 - this->commercialTax);
+
+			double revenue = tile.production * maxCustomers * tile.population / 100.0;
+			commercialRevenue += revenue;
+		}
+	}
+
+	// Adjust population pool for births and deaths
+	this->populationPool += this->populationPool * (this->birthRate - this->deathRate);
+	popTotal += this->populationPool;
+
+	// Adjust employment pool for changing population
+	float newWorkers = (popTotal - this->population) * this->proportionCanWork;
+	newWorkers *= newWorkers < 0 ? -1 : 1;
+	this->employmentPool += newWorkers;
+	this->employable += newWorkers;
+
+	if (this->employmentPool < 0) this->employmentPool = 0;
+	if (this->employable < 0) this->employable = 0;
+
+	// Update the city population
+	this->population = popTotal;
+
+	// Calculate city income from tax
+	this->earnings = (this->population - this->populationPool) * 15 * this->residentialTax;
+	this->earnings += commercialRevenue * this->commercialTax;
+	this->earnings += industrialRevenue * this->industrialTax;
+
+	return;
 }
