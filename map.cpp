@@ -4,6 +4,7 @@
 #include <vector>
 #include <fstream>
 #include <algorithm>
+#include <iostream>
 
 #include "map.hpp"
 #include "tile.hpp"
@@ -14,6 +15,11 @@ void Map::load(const std::string& filename, unsigned int width, unsigned int hei
 
     std::ifstream inputFile;
     inputFile.open(filename, std::ios::in | std::ios::binary);
+
+	if (inputFile.fail()) {
+		std::cerr << "Failed loading " << filename << std::endl;
+		return;
+	}
 
     this->width = width;
     this->height = height;

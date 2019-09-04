@@ -180,8 +180,7 @@ void City::update(float dt) {
 			int receivedResources = 0;
 			// Get resources from smalled and connected zones
 			for (auto& tile2 : this->map.tiles) {
-				if (tile2.regions[0] == til
-					e.regions[0] && tile2.tileType == TileType::INDUSTRIAL) {
+				if (tile2.regions[0] == tile.regions[0] && tile2.tileType == TileType::INDUSTRIAL) {
 					if (tile2.production > 0) {
 						++receivedResources;
 						--tile2.production;
